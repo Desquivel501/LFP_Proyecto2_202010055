@@ -5,13 +5,14 @@ from prettytable import PrettyTable
 class AnalizadorLexico:
 
     def __init__(self):
-        self.reservadas = ["CLAVES", "REGISTROS", "IMPRIMIR", "IMPRIMIRLN", "CONTEO", "PROMEDIO", "CONTARSI", "DATOS", "MAX", "MIN", "EXPORTARREPORTE"]
+        self.reservadas = ["CLAVES", "REGISTROS", "IMPRIMIR", "IMPRIMIRLN", "CONTEO", "PROMEDIO", "CONTARSI", "DATOS", "MAX", "MIN", "EXPORTARREPORTE", "SUMAR"]
         self.simbolos = [";", ",", "=", "{", "}", "[", "]", "(", ")"]
         self.listaTokens = [] 
         self.listaErrores = []
         self.linea = 1
         self.columna = 1
         self.buffer = ''
+        self.bufferError= ""
         self.estado = 0
         self.i = 0
         
@@ -80,10 +81,15 @@ class AnalizadorLexico:
                 self.i -= 1
             
             else:
-                self.agregar_error(self.buffer, self.linea, self.columna)
+                # self.agregar_error(self.buffer, self.linea, self.columna)
+                # self.estado = 0
+                # self.columna+=1
+                # self.i -= 1 
+                
+                self.agregarToken(self.buffer.strip(), "Texto" , self.linea, self.columna)
                 self.estado = 0
                 self.columna+=1
-                self.i -= 1 
+                self.i -= 1
                 
     def estado2(self,caracter):
         if caracter.isdigit():
@@ -143,7 +149,7 @@ class AnalizadorLexico:
     def estado10(self,caracter):
         if caracter == "'":
             self.buffer += caracter
-            self.estado = 10
+            self.estado = 11
             self.columna+=1
         else: 
             self.agregar_error(self.buffer, self.linea, self.columna)
@@ -158,10 +164,10 @@ class AnalizadorLexico:
             self.columna+=1
         elif caracter == '\n':
             self.buffer += caracter
-            self.fila+=1
+            self.linea+=1
             self.columna = 1
         else:
-            self.buffer += 1
+            self.buffer += caracter
             self.columna+=1
     
     def estado12(self,caracter):
@@ -188,23 +194,23 @@ class AnalizadorLexico:
 
     def detectarSimbolo(self,caracter):
         if caracter == ";":
-            self.agregarToken(str(caracter), "Punto y Coma", self.linea, self.columna)
+            self.agregarToken(str(caracter), "PuntoComa", self.linea, self.columna)
         elif caracter == ",":
             self.agregarToken(str(caracter), "Coma", self.linea, self.columna)
         elif caracter == "=":
             self.agregarToken(str(caracter), "Igual", self.linea, self.columna)
         elif caracter == "{":
-            self.agregarToken(str(caracter), "Llave Izquierda", self.linea, self.columna)
+            self.agregarToken(str(caracter), "LlaveIzquierda", self.linea, self.columna)
         elif caracter == "}":
-            self.agregarToken(str(caracter), "Llave Derecha", self.linea, self.columna)
+            self.agregarToken(str(caracter), "LlaveDerecha", self.linea, self.columna)
         elif caracter == "[":
-            self.agregarToken(str(caracter), "Corchete Izquierdo", self.linea, self.columna)
+            self.agregarToken(str(caracter), "CorcheteIzquierdo", self.linea, self.columna)
         elif caracter == "]":
-            self.agregarToken(str(caracter), "Corchete Derecho", self.linea, self.columna)
+            self.agregarToken(str(caracter), "CorcheteDerecho", self.linea, self.columna)
         elif caracter == "(":
-            self.agregarToken(str(caracter), "Parentesis Izquierdo", self.linea, self.columna)
+            self.agregarToken(str(caracter), "ParentesisIzquierdo", self.linea, self.columna)
         elif caracter == ")":
-            self.agregarToken(str(caracter), "Parentesis Derecho", self.linea, self.columna)
+            self.agregarToken(str(caracter), "ParentesisDerecho", self.linea, self.columna)
                 
         self.buffer = ''
         self.columna+=1
@@ -215,7 +221,7 @@ class AnalizadorLexico:
         else:
             return False  
             
-            
+          
     def analizar(self,cadena):
         self.listaTokens = [] 
         self.listaErrores = []
