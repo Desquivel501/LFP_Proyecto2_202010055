@@ -1,6 +1,5 @@
-IMPRIMIR("HOLA");
-IMPRIMIR("ME");
-IMPRIMIR("LLAMO");
-IMPRIMIR(2);
 
-IMPRIMIRLN("LINEA DIFERENTE");
+Claves = [
+	"codigo", "producto", "precio_compra", 
+	"precio_venta", "stock"
+]

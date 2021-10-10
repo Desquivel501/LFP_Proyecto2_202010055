@@ -7,6 +7,7 @@ class AnalizadorSintactico:
         self.tokens = tokens
         self.tokens.reverse()
         self.reservadas = ["CLAVES", "REGISTROS", "IMPRIMIR", "IMPRIMIRLN", "CONTEO", "PROMEDIO", "CONTARSI", "DATOS", "MAX", "MIN", "EXPORTARREPORTE", "SUMAR", "PUNTOCOMA"]
+        self.lista = []
         
     def agregarError(self,obtenido,esperado,fila,columna):
         self.errores.append(
@@ -18,11 +19,10 @@ class AnalizadorSintactico:
             )
         )
         tmp = self.tokens.pop()
-        # while tmp.tipo.upper() not in self.reservadas:
-        #     tmp = self.tokens.pop()
-            
         while tmp.tipo.upper() not in self.reservadas:
             tmp = self.tokens.pop()
+            
+            
     
     def impErrores(self):
         x = PrettyTable()
@@ -60,10 +60,14 @@ class AnalizadorSintactico:
     def INSTRUCCION(self):
         try:
             tmp = self.tokens[-1]
-            if tmp.tipo == 'IMPRIMIR':
+            if tmp.tipo == 'imprimir':
                 self.IMPRIMIR()
-            elif tmp.tipo == 'IMPRIMIRLN':
+            elif tmp.tipo == 'imprimirln':
                 self.IMPRIMIRLN()
+            elif tmp.tipo == 'Claves':
+                self.CLAVES()
+            else:
+                pass
         except:
             pass
     
@@ -123,4 +127,93 @@ class AnalizadorSintactico:
             self.agregarError(tmp.tipo,"IMPRIMIR",tmp.linea,tmp.columna)
            
                 
-    
+    def CLAVES(self):
+        temp_row = []
+        
+        tmp = self.tokens.pop()
+        if tmp.tipo == "Claves":
+            tmp = self.tokens.pop()
+            if tmp.tipo == "Igual":
+                tmp = self.tokens.pop()
+                if tmp.tipo == "CorcheteIzquierdo":
+                    finish = False
+                    while finish is False:
+                        tmp = self.tokens.pop()
+                        if tmp.tipo == "Cadena":
+                            cadena = tmp.lexema
+                            cadena = cadena.replace('"', '')
+                            temp_row.append(cadena)
+                            
+                            tmp = self.tokens.pop()
+                            if tmp.tipo == "Coma":
+                                continue
+                            elif tmp.tipo == "CorcheteDerecho":
+                                finish = True
+                            else:
+                                self.agregarError(tmp.tipo,"PuntoComa o CorcheteDerecho",tmp.linea,tmp.columna)
+                        else:
+                            self.agregarError(tmp.tipo,"Cadena",tmp.linea,tmp.columna)
+                            break
+                else:
+                    self.agregarError(tmp.tipo,"CorcheteIzquierdo",tmp.linea,tmp.columna)
+            else:
+                self.agregarError(tmp.tipo,"Igual",tmp.linea,tmp.columna)
+        else:
+            self.agregarError(tmp.tipo,"CLAVES",tmp.linea,tmp.columna)
+            
+        self.lista.append(temp_row)
+        print(temp_row)
+        
+        
+        
+    def REGISTROS(self):
+        
+        
+        tmp = self.tokens.pop()
+        if tmp.tipo == "Claves":
+            tmp = self.tokens.pop()
+            if tmp.tipo == "Igual":
+                tmp = self.tokens.pop()
+                if tmp.tipo == "CorcheteIzquierdo":
+                    registros = True
+                    
+                    while registros:
+                        tmp = self.tokens.pop()
+                        if tmp.tipo == "LlaveIzquierda":
+                            temp_row = []
+                            finish = False
+                            while finish is False:
+                                tmp = self.tokens.pop()
+                                if tmp.tipo == "Cadena" or tmp.tipo == "Decimal" or tmp.tipo == "Entero":
+                                    cadena = tmp.lexema
+                                    cadena = cadena.replace('"', '')
+                                    temp_row.append(cadena)
+                                    
+                                    tmp = self.tokens.pop()
+                                    if tmp.tipo == "Coma":
+                                        continue
+                                    elif tmp.tipo == "LlaveDerecha":
+                                        finish = True
+                                    else:
+                                        self.agregarError(tmp.tipo,"PuntoComa o LlaveDerecha",tmp.linea,tmp.columna)
+                                else:
+                                    self.agregarError(tmp.tipo,"Cadena",tmp.linea,tmp.columna)
+                                    break
+                            self.lista.append(temp_row)
+                        else:
+                            self.agregarError(tmp.tipo,"LlaveIzquierda",tmp.linea,tmp.columna)
+             
+                else:
+                    self.agregarError(tmp.tipo,"CorcheteIzquierdo",tmp.linea,tmp.columna)
+            else:
+                self.agregarError(tmp.tipo,"Igual",tmp.linea,tmp.columna)
+        else:
+            self.agregarError(tmp.tipo,"CLAVES",tmp.linea,tmp.columna)
+            
+        self.lista.append(temp_row)
+        print(temp_row)
+                    
+                            
+                            
+                    
+                
