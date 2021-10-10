@@ -168,7 +168,7 @@ class AnalizadorSintactico:
         
     def REGISTROS(self):
         
-        
+    #añadir corchete derecho
         tmp = self.tokens.pop()
         if tmp.tipo == "Claves":
             tmp = self.tokens.pop()
@@ -200,6 +200,7 @@ class AnalizadorSintactico:
                                     self.agregarError(tmp.tipo,"Cadena",tmp.linea,tmp.columna)
                                     break
                             self.lista.append(temp_row)
+                            
                         else:
                             self.agregarError(tmp.tipo,"LlaveIzquierda",tmp.linea,tmp.columna)
              
