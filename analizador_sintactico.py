@@ -1,4 +1,5 @@
 from prettytable import PrettyTable
+from functions import Functions
 
 class AnalizadorSintactico:
     
@@ -8,6 +9,8 @@ class AnalizadorSintactico:
         self.tokens.reverse()
         self.reservadas = ["CLAVES", "REGISTROS", "IMPRIMIR", "IMPRIMIRLN", "CONTEO", "PROMEDIO", "CONTARSI", "DATOS", "MAX", "MIN", "EXPORTARREPORTE", "SUMAR", "PUNTOCOMA"]
         self.lista = []
+        self.claves = []
+        self.funcion = Functions()
         
     def agregarError(self,obtenido,esperado,fila,columna):
         self.errores.append(
@@ -32,7 +35,17 @@ class AnalizadorSintactico:
         else:
             for i in self.errores:
                 x.add_row([i])
-            print(x)    
+            print(x)   
+
+    def impTabla(self):
+        x = PrettyTable()
+        x.field_names = self.claves
+        if len(self.lista)==0:
+            print('No hay Valores')
+        else:
+            for i in self.lista:
+                x.add_row(i)
+            print(x)     
             
     def analizar(self):
         self.INICIO()
@@ -54,7 +67,10 @@ class AnalizadorSintactico:
                 self.INSTRUCCIONES2()
             else:
                 pass
-        except:
+        except IndexError:
+            pass
+        except Exception as e: 
+            print(e)
             pass
 
     def INSTRUCCION(self):
@@ -66,15 +82,30 @@ class AnalizadorSintactico:
                 self.IMPRIMIRLN()
             elif tmp.tipo == 'Claves':
                 self.CLAVES()
+            elif tmp.tipo == 'Registros':
+                self.REGISTROS()
+            elif tmp.tipo == 'conteo':
+                self.CONTEO()
+            elif tmp.tipo == 'promedio':
+                self.PROMEDIO()
+            elif tmp.tipo == 'contarsi':
+                self.CONTARSI()
+            elif tmp.tipo == 'datos':
+                self.DATOS()
+            elif tmp.tipo == 'sumar':
+                self.SUMAR()
             else:
                 pass
-        except:
+        except IndexError:
+            pass
+        except Exception as e: 
+            print(e)
             pass
     
     def IMPRIMIR(self):
         cadena = None
         tmp = self.tokens.pop()
-        if tmp.tipo == "IMPRIMIR":
+        if tmp.tipo == "imprimir":
             tmp = self.tokens.pop()
             if tmp.tipo == "ParentesisIzquierdo":
                 tmp = self.tokens.pop()
@@ -101,7 +132,7 @@ class AnalizadorSintactico:
     def IMPRIMIRLN(self):
         cadena = None
         tmp = self.tokens.pop()
-        if tmp.tipo == "IMPRIMIRLN":
+        if tmp.tipo == "imprimirln":
             tmp = self.tokens.pop()
             if tmp.tipo == "ParentesisIzquierdo":
                 tmp = self.tokens.pop()
@@ -124,9 +155,8 @@ class AnalizadorSintactico:
             else:
                 self.agregarError(tmp.tipo,"ParentesisIzquierdo",tmp.linea,tmp.columna)
         else:
-            self.agregarError(tmp.tipo,"IMPRIMIR",tmp.linea,tmp.columna)
-           
-                
+            self.agregarError(tmp.tipo,"IMPRIMIRLN",tmp.linea,tmp.columna)
+                     
     def CLAVES(self):
         temp_row = []
         
@@ -161,22 +191,18 @@ class AnalizadorSintactico:
         else:
             self.agregarError(tmp.tipo,"CLAVES",tmp.linea,tmp.columna)
             
-        self.lista.append(temp_row)
-        print(temp_row)
-        
-        
+        self.claves = temp_row
+        print(self.claves)
         
     def REGISTROS(self):
         
-    #añadir corchete derecho
         tmp = self.tokens.pop()
-        if tmp.tipo == "Claves":
+        if tmp.tipo == "Registros":
             tmp = self.tokens.pop()
             if tmp.tipo == "Igual":
                 tmp = self.tokens.pop()
                 if tmp.tipo == "CorcheteIzquierdo":
                     registros = True
-                    
                     while registros:
                         tmp = self.tokens.pop()
                         if tmp.tipo == "LlaveIzquierda":
@@ -196,23 +222,171 @@ class AnalizadorSintactico:
                                         finish = True
                                     else:
                                         self.agregarError(tmp.tipo,"PuntoComa o LlaveDerecha",tmp.linea,tmp.columna)
+                                        break
                                 else:
                                     self.agregarError(tmp.tipo,"Cadena",tmp.linea,tmp.columna)
                                     break
                             self.lista.append(temp_row)
-                            
+
+                        elif tmp.tipo == "CorcheteDerecho":
+                            break
                         else:
-                            self.agregarError(tmp.tipo,"LlaveIzquierda",tmp.linea,tmp.columna)
-             
+                            self.agregarError(tmp.tipo,"LlaveIzquierda o CorcheteDerecho",tmp.linea,tmp.columna)
                 else:
                     self.agregarError(tmp.tipo,"CorcheteIzquierdo",tmp.linea,tmp.columna)
             else:
                 self.agregarError(tmp.tipo,"Igual",tmp.linea,tmp.columna)
         else:
-            self.agregarError(tmp.tipo,"CLAVES",tmp.linea,tmp.columna)
+            self.agregarError(tmp.tipo,"REGITROS",tmp.linea,tmp.columna)
             
-        self.lista.append(temp_row)
-        print(temp_row)
+    def CONTEO(self):
+        tmp = self.tokens.pop()
+        if tmp.tipo == "conteo":
+            
+            tmp = self.tokens.pop()
+            if tmp.tipo == "ParentesisIzquierdo":
+                
+                tmp = self.tokens.pop()
+                if tmp.tipo == "ParentesisDerecho":
+                    
+                    tmp = self.tokens.pop()
+                    if tmp.tipo == "PuntoComa":
+                        filas = len(self.lista)
+                        columnas = len(self.lista[0])
+                        conteo = int(filas)*int(columnas)
+                        print(conteo)
+                        
+                    else:
+                        self.agregarError(tmp.tipo,"PuntoComa",tmp.linea,tmp.columna)
+                else:
+                    self.agregarError(tmp.tipo,"ParentesisDerecho",tmp.linea,tmp.columna)
+            else:
+                self.agregarError(tmp.tipo,"ParentesisIzquierdo",tmp.linea,tmp.columna)
+        else:
+            self.agregarError(tmp.tipo,"conteo",tmp.linea,tmp.columna)
+
+    def DATOS(self):
+        tmp = self.tokens.pop()
+        if tmp.tipo == "datos":
+            tmp = self.tokens.pop()
+
+            if tmp.tipo == "ParentesisIzquierdo":
+                tmp = self.tokens.pop()
+
+                if tmp.tipo == "ParentesisDerecho":
+                    tmp = self.tokens.pop()
+
+                    if tmp.tipo == "PuntoComa":
+                        self.impTabla()
+                    else:
+                        self.agregarError(tmp.tipo,"PuntoComa",tmp.linea,tmp.columna)
+                else:
+                    self.agregarError(tmp.tipo,"ParentesisDerecho",tmp.linea,tmp.columna)
+            else:
+                self.agregarError(tmp.tipo,"ParentesisIzquierdo",tmp.linea,tmp.columna)
+        else:
+            self.agregarError(tmp.tipo,"conteo",tmp.linea,tmp.columna)
+
+    def PROMEDIO(self):
+        cadena = None
+        tmp = self.tokens.pop()
+        if tmp.tipo == "promedio":
+            tmp = self.tokens.pop()
+            if tmp.tipo == "ParentesisIzquierdo":
+                tmp = self.tokens.pop()
+                if tmp.tipo == "Cadena":
+                    cadena = tmp.lexema
+                    tmp = self.tokens.pop()
+                    if tmp.tipo == "ParentesisDerecho":
+                        tmp = self.tokens.pop()
+                        if tmp.tipo == "PuntoComa":
+                            resultado = self.funcion.promedio(self.lista, self.claves, cadena)
+                            if resultado is None:
+                                print("No se ha encontrado el campo")
+                            else:
+                                print(resultado)
+                        else:
+                            self.agregarError(tmp.tipo,"PuntoComa",tmp.linea,tmp.columna)    
+                    else:
+                        self.agregarError(tmp.tipo,"ParentesisDerecho",tmp.linea,tmp.columna)  
+                else:
+                    self.agregarError(tmp.tipo,"Cadena",tmp.linea,tmp.columna)
+            else:
+                self.agregarError(tmp.tipo,"ParentesisIzquierdo",tmp.linea,tmp.columna)
+        else:
+            self.agregarError(tmp.tipo,"IMPRIMIR",tmp.linea,tmp.columna)
+        
+    def SUMAR(self):
+        cadena = None
+        tmp = self.tokens.pop()
+        if tmp.tipo == "sumar":
+            tmp = self.tokens.pop()
+            if tmp.tipo == "ParentesisIzquierdo":
+                tmp = self.tokens.pop()
+                if tmp.tipo == "Cadena":
+                    cadena = tmp.lexema
+                    tmp = self.tokens.pop()
+                    if tmp.tipo == "ParentesisDerecho":
+                        tmp = self.tokens.pop()
+                        if tmp.tipo == "PuntoComa":
+                            resultado = self.funcion.sumar(self.lista, self.claves, cadena)
+                            if resultado is None:
+                                print("No se ha encontrado el campo")
+                            else:
+                                print(resultado)
+                        else:
+                            self.agregarError(tmp.tipo,"PuntoComa",tmp.linea,tmp.columna)    
+                    else:
+                        self.agregarError(tmp.tipo,"ParentesisDerecho",tmp.linea,tmp.columna)  
+                else:
+                    self.agregarError(tmp.tipo,"Cadena",tmp.linea,tmp.columna)
+            else:
+                self.agregarError(tmp.tipo,"ParentesisIzquierdo",tmp.linea,tmp.columna)
+        else:
+            self.agregarError(tmp.tipo,"IMPRIMIR",tmp.linea,tmp.columna)
+    
+    def CONTARSI(self):
+        campo = None
+        valor = None
+        tmp = self.tokens.pop()
+        if tmp.tipo == "contarsi":
+            tmp = self.tokens.pop()
+            if tmp.tipo == "ParentesisIzquierdo":
+                tmp = self.tokens.pop()
+                if tmp.tipo == "Cadena":
+                    campo = tmp.lexema
+                    tmp = self.tokens.pop()
+                    if tmp.tipo == "Coma":
+                        tmp = self.tokens.pop()
+                        if tmp.tipo == "Cadena" or tmp.tipo == "Decimal" or tmp.tipo == "Entero":
+                            valor = tmp.lexema
+                            tmp = self.tokens.pop()
+                            if tmp.tipo == "ParentesisDerecho":
+                                tmp = self.tokens.pop()
+                                if tmp.tipo == "PuntoComa":
+                                    resultado = self.funcion.contarSi(self.lista, self.claves, campo, valor)
+                                    if resultado is None:
+                                        print("No se ha encontrado el campo")
+                                    else:
+                                        print(resultado)
+                                else:
+                                    self.agregarError(tmp.tipo,"PuntoComa",tmp.linea,tmp.columna)     
+                            else:
+                                self.agregarError(tmp.tipo,"ParentesisDerecho",tmp.linea,tmp.columna)  
+                        else:
+                            self.agregarError(tmp.tipo,"Cadena o Decimal o Entero",tmp.linea,tmp.columna)
+                    else:
+                        self.agregarError(tmp.tipo,"Coma",tmp.linea,tmp.columna)    
+                else:
+                    self.agregarError(tmp.tipo,"Cadena",tmp.linea,tmp.columna)
+            else:
+                self.agregarError(tmp.tipo,"ParentesisIzquierdo",tmp.linea,tmp.columna)
+        else:
+            self.agregarError(tmp.tipo,"IMPRIMIR",tmp.linea,tmp.columna)
+
+
+                    
+
                     
                             
                             

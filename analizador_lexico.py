@@ -130,7 +130,7 @@ class AnalizadorLexico:
     def estado7(self,caracter):
         if caracter == '\n':
             self.estado = 0
-            self.fila+=1
+            self.linea+=1
             self.columna = 1
         else:
             self.columna+=1
