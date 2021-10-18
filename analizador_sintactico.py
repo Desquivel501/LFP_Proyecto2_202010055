@@ -1,5 +1,6 @@
 from prettytable import PrettyTable
 from functions import Functions
+from reportes import Reportes
 
 class AnalizadorSintactico:
     
@@ -11,6 +12,8 @@ class AnalizadorSintactico:
         self.lista = []
         self.claves = []
         self.funcion = Functions()
+        self.reporte = Reportes()
+        self.stream = ""
         
     def agregarError(self,obtenido,esperado,fila,columna):
         self.errores.append(
@@ -26,7 +29,6 @@ class AnalizadorSintactico:
             tmp = self.tokens.pop()
             
             
-    
     def impErrores(self):
         x = PrettyTable()
         x.field_names = ["Errores"]
@@ -45,7 +47,7 @@ class AnalizadorSintactico:
         else:
             for i in self.lista:
                 x.add_row(i)
-            print(x)     
+            self.stream += "\n" + str(x)
             
     def analizar(self):
         self.INICIO()
@@ -58,6 +60,9 @@ class AnalizadorSintactico:
     def INSTRUCCIONES(self):
         self.INSTRUCCION()
         self.INSTRUCCIONES2()
+        
+        if len(self.tokens) == 0:
+            print(self.stream)
         
     def INSTRUCCIONES2(self):
         try:
@@ -94,6 +99,12 @@ class AnalizadorSintactico:
                 self.DATOS()
             elif tmp.tipo == 'sumar':
                 self.SUMAR()
+            elif tmp.tipo == 'max':
+                self.MAX()
+            elif tmp.tipo == 'min':
+                self.MIN()
+            elif tmp.tipo == 'exportarReporte':
+                self.REPORTE()
             else:
                 pass
         except IndexError:
@@ -112,7 +123,8 @@ class AnalizadorSintactico:
                 if tmp.tipo == "Cadena":
                     cadena = tmp.lexema
                     cadena = cadena.replace('"', '')
-                    print(cadena , end =" ")
+                    # print(cadena , end =" ")
+                    self.stream += cadena
                     tmp = self.tokens.pop()
                     if tmp.tipo == "ParentesisDerecho":
                         tmp = self.tokens.pop()
@@ -139,8 +151,9 @@ class AnalizadorSintactico:
                 if tmp.tipo == "Cadena":
                     cadena = tmp.lexema
                     cadena = cadena.replace('"', '')
-                    print()
-                    print(cadena)
+                    # print()
+                    # print(cadena)
+                    self.stream += "\n" + cadena
                     tmp = self.tokens.pop()
                     if tmp.tipo == "ParentesisDerecho":
                         tmp = self.tokens.pop()
@@ -159,7 +172,6 @@ class AnalizadorSintactico:
                      
     def CLAVES(self):
         temp_row = []
-        
         tmp = self.tokens.pop()
         if tmp.tipo == "Claves":
             tmp = self.tokens.pop()
@@ -192,7 +204,6 @@ class AnalizadorSintactico:
             self.agregarError(tmp.tipo,"CLAVES",tmp.linea,tmp.columna)
             
         self.claves = temp_row
-        print(self.claves)
         
     def REGISTROS(self):
         
@@ -237,7 +248,7 @@ class AnalizadorSintactico:
             else:
                 self.agregarError(tmp.tipo,"Igual",tmp.linea,tmp.columna)
         else:
-            self.agregarError(tmp.tipo,"REGITROS",tmp.linea,tmp.columna)
+            self.agregarError(tmp.tipo,"REGISTROS",tmp.linea,tmp.columna)
             
     def CONTEO(self):
         tmp = self.tokens.pop()
@@ -254,7 +265,8 @@ class AnalizadorSintactico:
                         filas = len(self.lista)
                         columnas = len(self.lista[0])
                         conteo = int(filas)*int(columnas)
-                        print(conteo)
+                        # print(">>>"+str(conteo))
+                        self.stream += "\n>>>" + str(conteo)
                         
                     else:
                         self.agregarError(tmp.tipo,"PuntoComa",tmp.linea,tmp.columna)
@@ -278,6 +290,7 @@ class AnalizadorSintactico:
 
                     if tmp.tipo == "PuntoComa":
                         self.impTabla()
+                        pass
                     else:
                         self.agregarError(tmp.tipo,"PuntoComa",tmp.linea,tmp.columna)
                 else:
@@ -285,7 +298,7 @@ class AnalizadorSintactico:
             else:
                 self.agregarError(tmp.tipo,"ParentesisIzquierdo",tmp.linea,tmp.columna)
         else:
-            self.agregarError(tmp.tipo,"conteo",tmp.linea,tmp.columna)
+            self.agregarError(tmp.tipo,"DATOS",tmp.linea,tmp.columna)
 
     def PROMEDIO(self):
         cadena = None
@@ -304,7 +317,8 @@ class AnalizadorSintactico:
                             if resultado is None:
                                 print("No se ha encontrado el campo")
                             else:
-                                print(resultado)
+                                # print(">>>",resultado)
+                                self.stream += "\n>>>" + resultado
                         else:
                             self.agregarError(tmp.tipo,"PuntoComa",tmp.linea,tmp.columna)    
                     else:
@@ -314,7 +328,7 @@ class AnalizadorSintactico:
             else:
                 self.agregarError(tmp.tipo,"ParentesisIzquierdo",tmp.linea,tmp.columna)
         else:
-            self.agregarError(tmp.tipo,"IMPRIMIR",tmp.linea,tmp.columna)
+            self.agregarError(tmp.tipo,"PROMEDIO",tmp.linea,tmp.columna)
         
     def SUMAR(self):
         cadena = None
@@ -333,7 +347,8 @@ class AnalizadorSintactico:
                             if resultado is None:
                                 print("No se ha encontrado el campo")
                             else:
-                                print(resultado)
+                                # print(">>>",resultado)
+                                self.stream += "\n>>>"+resultado
                         else:
                             self.agregarError(tmp.tipo,"PuntoComa",tmp.linea,tmp.columna)    
                     else:
@@ -343,7 +358,7 @@ class AnalizadorSintactico:
             else:
                 self.agregarError(tmp.tipo,"ParentesisIzquierdo",tmp.linea,tmp.columna)
         else:
-            self.agregarError(tmp.tipo,"IMPRIMIR",tmp.linea,tmp.columna)
+            self.agregarError(tmp.tipo,"SUMAR",tmp.linea,tmp.columna)
     
     def CONTARSI(self):
         campo = None
@@ -368,7 +383,8 @@ class AnalizadorSintactico:
                                     if resultado is None:
                                         print("No se ha encontrado el campo")
                                     else:
-                                        print(resultado)
+                                        # print(">>>",resultado)
+                                        self.stream += "\n>>>"+resultado
                                 else:
                                     self.agregarError(tmp.tipo,"PuntoComa",tmp.linea,tmp.columna)     
                             else:
@@ -382,12 +398,93 @@ class AnalizadorSintactico:
             else:
                 self.agregarError(tmp.tipo,"ParentesisIzquierdo",tmp.linea,tmp.columna)
         else:
-            self.agregarError(tmp.tipo,"IMPRIMIR",tmp.linea,tmp.columna)
+            self.agregarError(tmp.tipo,"CONTARSI",tmp.linea,tmp.columna)
 
+    def MAX(self):
+        cadena = None
+        tmp = self.tokens.pop()
+        if tmp.tipo == "max":
+            tmp = self.tokens.pop()
+            if tmp.tipo == "ParentesisIzquierdo":
+                tmp = self.tokens.pop()
+                if tmp.tipo == "Cadena":
+                    cadena = tmp.lexema
+                    tmp = self.tokens.pop()
+                    if tmp.tipo == "ParentesisDerecho":
+                        tmp = self.tokens.pop()
+                        if tmp.tipo == "PuntoComa":
+                            resultado = self.funcion.max(self.lista, self.claves, cadena)
+                            if resultado is None:
+                                print("No se ha encontrado el campo")
+                            else:
+                                # print(">>>",resultado)
+                                self.stream += "\n>>>"+resultado
+                        else:
+                            self.agregarError(tmp.tipo,"PuntoComa",tmp.linea,tmp.columna)    
+                    else:
+                        self.agregarError(tmp.tipo,"ParentesisDerecho",tmp.linea,tmp.columna)  
+                else:
+                    self.agregarError(tmp.tipo,"Cadena",tmp.linea,tmp.columna)
+            else:
+                self.agregarError(tmp.tipo,"ParentesisIzquierdo",tmp.linea,tmp.columna)
+        else:
+            self.agregarError(tmp.tipo,"MAX",tmp.linea,tmp.columna)           
 
-                    
-
-                    
+    def MIN(self):
+        cadena = None
+        tmp = self.tokens.pop()
+        if tmp.tipo == "min":
+            tmp = self.tokens.pop()
+            if tmp.tipo == "ParentesisIzquierdo":
+                tmp = self.tokens.pop()
+                if tmp.tipo == "Cadena":
+                    cadena = tmp.lexema
+                    tmp = self.tokens.pop()
+                    if tmp.tipo == "ParentesisDerecho":
+                        tmp = self.tokens.pop()
+                        if tmp.tipo == "PuntoComa":
+                            resultado = self.funcion.min(self.lista, self.claves, cadena)
+                            if resultado is None:
+                                print("No se ha encontrado el campo")
+                            else:
+                                # print(">>>",resultado)
+                                self.stream += "\n>>>"+ resultado
+                        else:
+                            self.agregarError(tmp.tipo,"PuntoComa",tmp.linea,tmp.columna)    
+                    else:
+                        self.agregarError(tmp.tipo,"ParentesisDerecho",tmp.linea,tmp.columna)  
+                else:
+                    self.agregarError(tmp.tipo,"Cadena",tmp.linea,tmp.columna)
+            else:
+                self.agregarError(tmp.tipo,"ParentesisIzquierdo",tmp.linea,tmp.columna)
+        else:
+            self.agregarError(tmp.tipo,"MIN",tmp.linea,tmp.columna)
+    
+    def REPORTE(self):
+        cadena = None
+        tmp = self.tokens.pop()
+        if tmp.tipo == "exportarReporte":
+            tmp = self.tokens.pop()
+            if tmp.tipo == "ParentesisIzquierdo":
+                tmp = self.tokens.pop()
+                if tmp.tipo == "Cadena":
+                    cadena = tmp.lexema
+                    tmp = self.tokens.pop()
+                    if tmp.tipo == "ParentesisDerecho":
+                        tmp = self.tokens.pop()
+                        if tmp.tipo == "PuntoComa":
+                            self.reporte.reporteHtml(cadena, self.claves, self.lista)
+                        else:
+                            self.agregarError(tmp.tipo,"PuntoComa",tmp.linea,tmp.columna)    
+                    else:
+                        self.agregarError(tmp.tipo,"ParentesisDerecho",tmp.linea,tmp.columna)  
+                else:
+                    self.agregarError(tmp.tipo,"Cadena",tmp.linea,tmp.columna)
+            else:
+                self.agregarError(tmp.tipo,"ParentesisIzquierdo",tmp.linea,tmp.columna)
+        else:
+            self.agregarError(tmp.tipo,"MIN",tmp.linea,tmp.columna)           
+                
                             
                             
                     

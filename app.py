@@ -6,7 +6,7 @@ from tkinter.filedialog import askopenfilename
 
 def leer(): 
     # filename = askopenfilename()
-    archivo = open("prueba.txt", 'r')
+    archivo = open("entrada(1).lfp", 'r')
     contenido = archivo.read()
     archivo.close()
     
