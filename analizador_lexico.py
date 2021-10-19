@@ -15,6 +15,7 @@ class AnalizadorLexico:
         self.bufferError= ""
         self.estado = 0
         self.i = 0
+        self.errores = []
         
     def agregarToken(self, caracter, token, linea, columna):
         self.listaTokens.append(Token(caracter,token,linea,columna))
@@ -23,6 +24,14 @@ class AnalizadorLexico:
     def agregar_error(self,caracter,linea,columna):
         self.listaErrores.append(Error('Caracter ' + caracter + ' no reconocido en el lenguaje.', linea, columna))
         self.buffer = ''
+        
+        self.errores.append(
+            "<ERROR LEXICO> Caracter {} no reconocido en el lenguaje. Fila: {}, Columna: {}".format(
+                caracter,
+                linea,
+                columna
+            )
+        )
         
     def estado0(self, caracter):
         if caracter.isalpha():
@@ -252,7 +261,7 @@ class AnalizadorLexico:
                 self.estado13(cadena[self.i])
             self.i += 1
         
-        return (self.listaTokens,self.listaErrores)
+        return (self.listaTokens,self.listaErrores, self.errores)
     
         
     def impTokens(self):

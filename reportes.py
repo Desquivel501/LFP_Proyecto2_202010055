@@ -52,6 +52,7 @@ class Reportes:
         archivo = open("Reporte.html","w+")
         archivo.write(html)
         # print(">>>Se ha generado el reporte en: " + cwd + "\Reporte.html")
+        return "\n>>>Se ha generado el reporte en: " + cwd + "\Reporte.html"
         archivo.close()
         # os.startfile("Reporte.html")
         

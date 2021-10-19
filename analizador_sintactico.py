@@ -4,8 +4,8 @@ from reportes import Reportes
 
 class AnalizadorSintactico:
     
-    def __init__(self,tokens = []):
-        self.errores = []
+    def __init__(self,tokens = [], errores=[]):
+        self.errores = errores
         self.tokens = tokens
         self.tokens.reverse()
         self.reservadas = ["CLAVES", "REGISTROS", "IMPRIMIR", "IMPRIMIRLN", "CONTEO", "PROMEDIO", "CONTARSI", "DATOS", "MAX", "MIN", "EXPORTARREPORTE", "SUMAR", "PUNTOCOMA"]
@@ -25,6 +25,7 @@ class AnalizadorSintactico:
             )
         )
         tmp = self.tokens.pop()
+        
         while tmp.tipo.upper() not in self.reservadas:
             tmp = self.tokens.pop()
             
@@ -37,7 +38,9 @@ class AnalizadorSintactico:
         else:
             for i in self.errores:
                 x.add_row([i])
-            print(x)   
+            self.stream += "\n" + str(x)
+            # print(x)  
+        
 
     def impTabla(self):
         x = PrettyTable()
@@ -52,6 +55,7 @@ class AnalizadorSintactico:
     def analizar(self):
         self.INICIO()
         self.impErrores()
+        return self.stream
         
         
     def INICIO(self):
@@ -60,9 +64,6 @@ class AnalizadorSintactico:
     def INSTRUCCIONES(self):
         self.INSTRUCCION()
         self.INSTRUCCIONES2()
-        
-        if len(self.tokens) == 0:
-            print(self.stream)
         
     def INSTRUCCIONES2(self):
         try:
@@ -473,7 +474,8 @@ class AnalizadorSintactico:
                     if tmp.tipo == "ParentesisDerecho":
                         tmp = self.tokens.pop()
                         if tmp.tipo == "PuntoComa":
-                            self.reporte.reporteHtml(cadena, self.claves, self.lista)
+                            reporte = self.reporte.reporteHtml(cadena, self.claves, self.lista)
+                            self.stream += reporte
                         else:
                             self.agregarError(tmp.tipo,"PuntoComa",tmp.linea,tmp.columna)    
                     else:
