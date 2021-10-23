@@ -79,7 +79,7 @@ class Ui_MainWindow(object):
         font.setPointSize(12)
         self.comboBox.setFont(font)
         self.comboBox.setObjectName("comboBox")
-        self.comboBox.setStyleSheet("background-color :rgb(201, 209, 217)")
+        self.comboBox.setStyleSheet("background-color : rgb(201, 209, 217);")
         self.horizontalLayout_3.addWidget(self.comboBox)
         self.pushButton_3 = QtWidgets.QPushButton(self.horizontalLayoutWidget_4)
         font = QtGui.QFont()
@@ -104,7 +104,7 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Proyecto 2 - 202010055"))
         self.pushButton_1.setText(_translate("MainWindow", "Abrir"))
-        self.pushButton_2.setText(_translate("MainWindow", "Generar"))
+        self.pushButton_2.setText(_translate("MainWindow", "Analizar"))
         self.label.setText(_translate("MainWindow", "Reportes"))
         self.pushButton_3.setText(_translate("MainWindow", "Generar"))
         self.actionCargar_Archivo.setText(_translate("MainWindow", "Cargar Archivo"))

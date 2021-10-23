@@ -261,7 +261,7 @@ class AnalizadorLexico:
                 self.estado13(cadena[self.i])
             self.i += 1
         
-        return (self.listaTokens,self.listaErrores, self.errores)
+        return (self.listaTokens, self.errores)
     
         
     def impTokens(self):
