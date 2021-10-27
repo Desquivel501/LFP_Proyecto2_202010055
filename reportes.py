@@ -23,7 +23,7 @@ class Reportes:
                 
                     &nbsp;
                     <h1 style="text-align: center;"> """+ str(titulo) + """</h1>
-                    <&nbsp;<                     
+                    &nbsp;                   
 
                     <table style="height: 108px; width: 60%; border-collapse: collapse; margin-left: auto; margin-right: auto;" class="table table-striped">
                     <thead class="table-dark">
@@ -52,9 +52,10 @@ class Reportes:
         archivo = open("Reporte.html","w+")
         archivo.write(html)
         # print(">>>Se ha generado el reporte en: " + cwd + "\Reporte.html")
-        return "\n>>>Se ha generado el reporte en: " + cwd + "\Reporte.html"
         archivo.close()
         # os.startfile("Reporte.html")
+        return "\n>>>Se ha generado el reporte en: " + cwd + "\Reporte.html"
+        
     
     
     def reporteErrores(self, titulo, registros, claves):
@@ -75,7 +76,7 @@ class Reportes:
                 
                     &nbsp;
                     <h1 style="text-align: center;"> """+ str(titulo) + """</h1>
-                    <&nbsp;<                     
+                    &nbsp;                    
 
                     <table style="height: 108px; width: 60%; border-collapse: collapse; margin-left: auto; margin-right: auto;" class="table table-striped">
                     <thead class="table-dark">
@@ -101,12 +102,13 @@ class Reportes:
                     </table>"""
         
         cwd = os.getcwd()
-        archivo = open("ReporteHTML.html","w+")
+        archivo = open("ReporteErrores.html","w+")
         archivo.write(html)
-        # print(">>>Se ha generado el reporte en: " + cwd + "\ReporteHTML.html")
-        return "\n>>>Se ha generado el reporte en: " + cwd + "\ReporteHTML.html"
+        # print(">>>Se ha generado el reporte en: " + cwd + "\ReporteErrores.html")
         archivo.close()
-        # os.startfile("ReporteHTML.html")
+        os.startfile("ReporteErrores.html")
+        return "\n>>>Se ha generado el reporte en: " + cwd + "\ReporteErrores.html"
+        
         
     
     def reporteTokens(self, listaTokens):

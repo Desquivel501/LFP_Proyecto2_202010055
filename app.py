@@ -18,6 +18,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.contenido = ""
         self.listaErrores = []
         self.listaTokens = []
+        self.arbol = None
         lista = ["Reporte de Tokens","Reporte de Errores", "Árbol de derivación" ]
         self.comboBox.clear()
         self.comboBox.addItems(lista)
@@ -26,7 +27,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.pushButton_3.clicked.connect(self.generarReporte)
 
     def abrir(self):
-        archivo = open("entrada(1).lfp", 'r')
+        filename = askopenfilename()
+        archivo = open(filename, 'r')
         self.contenido = archivo.read()
         archivo.close()
         self.plainTextEdit.setPlainText(self.contenido)
@@ -41,8 +43,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         
         consola = parser.analizar()
         self.plainTextEdit_2.setPlainText(consola[0])
-        
         self.listaErrores = consola[1]
+        self.arbol = consola[2]
     
     def generarReporte(self):
         reportes = Reportes()
@@ -51,7 +53,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if current == "Reporte de Tokens":
             reportes.reporteTokens(reversed(self.listaTokens))
         elif current == "Reporte de Errores":
-             reportes.reporteErrores(self.listaErrores)
+            reportes.reporteErrores(self.listaErrores)
+        elif current == "Árbol de derivación":
+            self.arbol.view()
 
     
 if __name__ == '__main__':
