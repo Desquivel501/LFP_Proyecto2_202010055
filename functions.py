@@ -40,7 +40,6 @@ class Functions:
         return None    
     
     def contarSi(self, registros, claves, campo, valor):
-        print(campo,valor)
         cadena = campo.replace('"', '')
         cont=0
         found=False

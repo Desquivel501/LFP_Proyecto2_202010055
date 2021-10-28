@@ -75,8 +75,7 @@ class AnalizadorLexico:
             self.buffer += caracter
             self.agregar_error(self.buffer,self.linea,self.columna)
             self.columna += 1 
-        
-      
+            
     def estado1(self,caracter):
         if caracter.isalpha():
             self.buffer +=caracter
@@ -90,15 +89,10 @@ class AnalizadorLexico:
                 self.i -= 1
             
             else:
-                # self.agregar_error(self.buffer, self.linea, self.columna)
-                # self.estado = 0
-                # self.columna+=1
-                # self.i -= 1 
-                
-                self.agregarToken(self.buffer.strip(), "Texto" , self.linea, self.columna)
+                self.agregar_error(self.buffer, self.linea, self.columna)
                 self.estado = 0
                 self.columna+=1
-                self.i -= 1
+                self.i -= 1 
                 
     def estado2(self,caracter):
         if caracter.isdigit():

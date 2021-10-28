@@ -49,12 +49,12 @@ class Reportes:
                     </table>"""
         
         cwd = os.getcwd()
-        archivo = open("Reporte.html","w+")
+        archivo = open("Reportes\Reporte.html","w+")
         archivo.write(html)
         # print(">>>Se ha generado el reporte en: " + cwd + "\Reporte.html")
         archivo.close()
-        # os.startfile("Reporte.html")
-        return "\n>>>Se ha generado el reporte en: " + cwd + "\Reporte.html"
+        os.startfile("Reportes\Reporte.html")
+        return "\n>>>Se ha generado el reporte en: " + cwd + "\Reportes\Reporte.html"
         
     
     
@@ -102,12 +102,12 @@ class Reportes:
                     </table>"""
         
         cwd = os.getcwd()
-        archivo = open("ReporteErrores.html","w+")
+        archivo = open("Reportes\ReporteErrores.html","w+")
         archivo.write(html)
         # print(">>>Se ha generado el reporte en: " + cwd + "\ReporteErrores.html")
         archivo.close()
-        os.startfile("ReporteErrores.html")
-        return "\n>>>Se ha generado el reporte en: " + cwd + "\ReporteErrores.html"
+        os.startfile("Reportes\ReporteErrores.html")
+        return "\n>>>Se ha generado el reporte en: " + cwd + "\Reportes\ReporteErrores.html"
         
         
     
@@ -129,7 +129,7 @@ class Reportes:
                 
                     &nbsp;
                     <h1 style="text-align: center;">Reporte de Tokens</h1>
-                    <&nbsp;<                     
+                    &nbsp;                 
 
                     <table style="height: 108px; width: 60%; border-collapse: collapse; margin-left: auto; margin-right: auto;" class="table table-striped">
                     <thead>
@@ -158,12 +158,12 @@ class Reportes:
         """
         
         cwd = os.getcwd()
-        archivo = open("ReporteTokens.html","w+")
+        archivo = open("Reportes\ReporteTokens.html","w+")
         archivo.write(html)
         # print(">>>Se ha generado el reporte en: " + cwd + "\ReporteTokens.html")
         archivo.close()
-        os.startfile("ReporteTokens.html")
-        return "\n>>>Se ha generado el reporte en: " + cwd + "\ReporteTokens.html"
+        os.startfile("Reportes\ReporteTokens.html")
+        return "\n>>>Se ha generado el reporte en: " + cwd + "\Reportes\ReporteTokens.html"
 
 
     def reporteErrores(self, listaErrores):

@@ -30,7 +30,7 @@ class AnalizadorSintactico:
             )
         )
         tmp = self.tokens.pop()
-        while tmp.tipo.upper() not in self.reservadas:
+        while tmp.tipo.upper() != "PUNTOCOMA":
             tmp = self.tokens.pop()
 
 
@@ -64,84 +64,83 @@ class AnalizadorSintactico:
 
     def INICIO(self):
         self.inicio = self.crearNodo('INICIO')
-        self.INSTRUCCIONES(self.inicio)
-        # self.g.view()
+        self.INSTRUCCIONES()
+        
 
-    def INSTRUCCIONES(self, nodoInicio):
+    def INSTRUCCIONES(self):
         instrucciones = self.crearNodo('INSTRUCCIONES')
-        self.agregarHijo(nodoInicio, instrucciones)
+        self.agregarHijo(self.inicio, instrucciones)
         self.inicio = instrucciones
         
-        self.INSTRUCCION(nodoInicio)
-        self.INSTRUCCIONES2(nodoInicio)
+        self.INSTRUCCION()
+        self.INSTRUCCIONES2()
 
-    def INSTRUCCIONES2(self, nodoInicio):
+    def INSTRUCCIONES2(self):
         try:
             tmp = self.tokens[-1]
             if tmp.tipo.upper() in self.reservadas:
-                self.INSTRUCCION(nodoInicio)
-                self.INSTRUCCIONES2(nodoInicio)
+                self.INSTRUCCION()
+                self.INSTRUCCIONES2()
             else:
-                print("here1")
                 self.agregarError(tmp.tipo,"Instruccion",tmp.linea,tmp.columna)
-                self.INSTRUCCION(nodoInicio)
-                self.INSTRUCCIONES2(nodoInicio)
-
+                self.INSTRUCCION()
+                self.INSTRUCCIONES2()
         except IndexError:
             pass
         except Exception as e:
+            print("Here")
             print(e)
             pass
 
-    def INSTRUCCION(self, nodoInicio):
+    def INSTRUCCION(self):
         try:
             tmp = self.tokens[-1]
             if tmp.tipo == 'imprimir':
                 instruccion = self.crearNodo('INSTRUCCION')
-                self.IMPRIMIR(nodoInicio, instruccion)
+                self.IMPRIMIR(instruccion)
             elif tmp.tipo == 'imprimirln':
                 instruccion = self.crearNodo('INSTRUCCION')
-                self.IMPRIMIRLN(nodoInicio, instruccion)
+                self.IMPRIMIRLN(instruccion)
             elif tmp.tipo == 'Claves':
                 # instruccion = self.crearNodo('INSTRUCCION')
-                self.CLAVES(nodoInicio, None)
+                self.CLAVES(None)
             elif tmp.tipo == 'Registros':
                 # instruccion = self.crearNodo('INSTRUCCION')
-                self.REGISTROS(nodoInicio, None)
+                self.REGISTROS(None)
             elif tmp.tipo == 'conteo':
                 instruccion = self.crearNodo('INSTRUCCION')
-                self.CONTEO(nodoInicio, instruccion)
+                self.CONTEO(instruccion)
             elif tmp.tipo == 'promedio':
                 instruccion = self.crearNodo('INSTRUCCION')
-                self.PROMEDIO(nodoInicio, instruccion)
+                self.PROMEDIO(instruccion)
             elif tmp.tipo == 'contarsi':
                 instruccion = self.crearNodo('INSTRUCCION')
-                self.CONTARSI(nodoInicio, instruccion)
+                self.CONTARSI(instruccion)
             elif tmp.tipo == 'datos':
                 instruccion = self.crearNodo('INSTRUCCION')
-                self.DATOS(nodoInicio, instruccion)
+                self.DATOS(instruccion)
             elif tmp.tipo == 'sumar':
                 instruccion = self.crearNodo('INSTRUCCION')
-                self.SUMAR(nodoInicio, instruccion)
+                self.SUMAR(instruccion)
             elif tmp.tipo == 'max':
                 instruccion = self.crearNodo('INSTRUCCION')
-                self.MAX(nodoInicio, instruccion)
+                self.MAX(instruccion)
             elif tmp.tipo == 'min':
                 instruccion = self.crearNodo('INSTRUCCION')
-                self.MIN(nodoInicio, instruccion)
+                self.MIN(instruccion)
             elif tmp.tipo == 'exportarReporte':
                 instruccion = self.crearNodo('INSTRUCCION')
-                self.REPORTE(nodoInicio, instruccion)
+                self.REPORTE(instruccion)
             else:
                 pass
-            return instruccion
         except IndexError:
             pass
         except Exception as e:
+            print("here2")
             print(e)
             pass
 
-    def IMPRIMIR(self, nodoInicio, nodoInstruccion):
+    def IMPRIMIR(self, nodoInstruccion):
         cadena = None
         tmp = self.tokens.pop()
         if tmp.tipo == "imprimir":
@@ -198,7 +197,7 @@ class AnalizadorSintactico:
         else:
             self.agregarError(tmp.tipo,"IMPRIMIR",tmp.linea,tmp.columna)
 
-    def IMPRIMIRLN(self, nodoInicio, nodoInstruccion):
+    def IMPRIMIRLN(self, nodoInstruccion):
         cadena = None
         tmp = self.tokens.pop()
         if tmp.tipo == "imprimirln":
@@ -255,7 +254,7 @@ class AnalizadorSintactico:
         else:
             self.agregarError(tmp.tipo,"IMPRIMIRLN",tmp.linea,tmp.columna)
 
-    def CLAVES(self, nodoInicio, nodoInstruccion):
+    def CLAVES(self, nodoInstruccion):
         temp_row = []
         tmp = self.tokens.pop()
         if tmp.tipo == "Claves":
@@ -290,7 +289,7 @@ class AnalizadorSintactico:
 
         self.claves = temp_row
 
-    def REGISTROS(self, nodoInicio, nodoInstruccion):
+    def REGISTROS(self, nodoInstruccion):
 
         tmp = self.tokens.pop()
         if tmp.tipo == "Registros":
@@ -317,7 +316,7 @@ class AnalizadorSintactico:
                                     elif tmp.tipo == "LlaveDerecha":
                                         finish = True
                                     else:
-                                        self.agregarError(tmp.tipo,"PuntoComa o LlaveDerecha",tmp.linea,tmp.columna)
+                                        self.agregarError(tmp.tipo,"Coma o LlaveDerecha",tmp.linea,tmp.columna)
                                         break
                                 else:
                                     self.agregarError(tmp.tipo,"Cadena",tmp.linea,tmp.columna)
@@ -335,7 +334,7 @@ class AnalizadorSintactico:
         else:
             self.agregarError(tmp.tipo,"REGISTROS",tmp.linea,tmp.columna)
 
-    def CONTEO(self, nodoInicio, nodoInstruccion):
+    def CONTEO(self, nodoInstruccion):
         tmp = self.tokens.pop()
         if tmp.tipo == "conteo":
             n0 = self.crearNodo('CONTEO')
@@ -385,7 +384,7 @@ class AnalizadorSintactico:
         else:
             self.agregarError(tmp.tipo,"conteo",tmp.linea,tmp.columna)
 
-    def DATOS(self, nodoInicio, nodoInstruccion):
+    def DATOS(self, nodoInstruccion):
         tmp = self.tokens.pop()
         if tmp.tipo == "datos":
             n0 = self.crearNodo('DATOS')
@@ -430,7 +429,7 @@ class AnalizadorSintactico:
         else:
             self.agregarError(tmp.tipo,"DATOS",tmp.linea,tmp.columna)
 
-    def PROMEDIO(self, nodoInicio, nodoInstruccion):
+    def PROMEDIO(self, nodoInstruccion):
         cadena = None
         tmp = self.tokens.pop()
         if tmp.tipo == "promedio":
@@ -490,7 +489,7 @@ class AnalizadorSintactico:
         else:
             self.agregarError(tmp.tipo,"PROMEDIO",tmp.linea,tmp.columna)
 
-    def SUMAR(self, nodoInicio, nodoInstruccion):
+    def SUMAR(self, nodoInstruccion):
         cadena = None
         tmp = self.tokens.pop()
         if tmp.tipo == "sumar":
@@ -550,7 +549,7 @@ class AnalizadorSintactico:
         else:
             self.agregarError(tmp.tipo,"SUMAR",tmp.linea,tmp.columna)
 
-    def CONTARSI(self, nodoInicio, nodoInstruccion):
+    def CONTARSI(self, nodoInstruccion):
         campo = None
         valor = None
         tmp = self.tokens.pop()
@@ -632,7 +631,7 @@ class AnalizadorSintactico:
         else:
             self.agregarError(tmp.tipo,"CONTARSI",tmp.linea,tmp.columna)
 
-    def MAX(self, nodoInicio, nodoInstruccion):
+    def MAX(self, nodoInstruccion):
         cadena = None
         tmp = self.tokens.pop()
         if tmp.tipo == "max":
@@ -693,7 +692,7 @@ class AnalizadorSintactico:
         else:
             self.agregarError(tmp.tipo,"MAX",tmp.linea,tmp.columna)
 
-    def MIN(self, nodoInicio, nodoInstruccion):
+    def MIN(self, nodoInstruccion):
         cadena = None
         tmp = self.tokens.pop()
         if tmp.tipo == "min":
@@ -754,7 +753,7 @@ class AnalizadorSintactico:
         else:
             self.agregarError(tmp.tipo,"MIN",tmp.linea,tmp.columna)
 
-    def REPORTE(self, nodoInicio, nodoInstruccion):
+    def REPORTE(self, nodoInstruccion):
         cadena = None
         tmp = self.tokens.pop()
         if tmp.tipo == "exportarReporte":
