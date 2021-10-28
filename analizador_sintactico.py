@@ -29,8 +29,8 @@ class AnalizadorSintactico:
                 columna
             )
         )
-        tmp = self.tokens.pop()
-        while tmp.tipo.upper() != "PUNTOCOMA":
+        tmp = self.tokens[-1]
+        while tmp.tipo.upper() not in self.reservadas :
             tmp = self.tokens.pop()
 
 
@@ -187,14 +187,19 @@ class AnalizadorSintactico:
                             self.inicio = nodoInstruccion
 
                         else:
+                            self.tokens.append(tmp)
                             self.agregarError(tmp.tipo,"PuntoComa",tmp.linea,tmp.columna)
                     else:
+                        self.tokens.append(tmp)
                         self.agregarError(tmp.tipo,"ParentesisDerecho",tmp.linea,tmp.columna)
                 else:
+                    self.tokens.append(tmp)
                     self.agregarError(tmp.tipo,"Cadena",tmp.linea,tmp.columna)
             else:
+                self.tokens.append(tmp)
                 self.agregarError(tmp.tipo,"ParentesisIzquierdo",tmp.linea,tmp.columna)
         else:
+            self.tokens.append(tmp)
             self.agregarError(tmp.tipo,"IMPRIMIR",tmp.linea,tmp.columna)
 
     def IMPRIMIRLN(self, nodoInstruccion):
@@ -244,14 +249,19 @@ class AnalizadorSintactico:
                             self.inicio = nodoInstruccion
     
                         else:
+                            self.tokens.append(tmp)
                             self.agregarError(tmp.tipo,"PuntoComa",tmp.linea,tmp.columna)
                     else:
+                        self.tokens.append(tmp)
                         self.agregarError(tmp.tipo,"ParentesisDerecho",tmp.linea,tmp.columna)
                 else:
+                    self.tokens.append(tmp)
                     self.agregarError(tmp.tipo,"Cadena",tmp.linea,tmp.columna)
             else:
+                self.tokens.append(tmp)
                 self.agregarError(tmp.tipo,"ParentesisIzquierdo",tmp.linea,tmp.columna)
         else:
+            self.tokens.append(tmp)
             self.agregarError(tmp.tipo,"IMPRIMIRLN",tmp.linea,tmp.columna)
 
     def CLAVES(self, nodoInstruccion):
@@ -276,15 +286,20 @@ class AnalizadorSintactico:
                             elif tmp.tipo == "CorcheteDerecho":
                                 finish = True
                             else:
+                                self.tokens.append(tmp)
                                 self.agregarError(tmp.tipo,"PuntoComa o CorcheteDerecho",tmp.linea,tmp.columna)
                         else:
+                            self.tokens.append(tmp)
                             self.agregarError(tmp.tipo,"Cadena",tmp.linea,tmp.columna)
                             break
                 else:
+                    self.tokens.append(tmp)
                     self.agregarError(tmp.tipo,"CorcheteIzquierdo",tmp.linea,tmp.columna)
             else:
+                self.tokens.append(tmp)
                 self.agregarError(tmp.tipo,"Igual",tmp.linea,tmp.columna)
         else:
+            self.tokens.append(tmp)
             self.agregarError(tmp.tipo,"CLAVES",tmp.linea,tmp.columna)
 
         self.claves = temp_row
@@ -316,9 +331,11 @@ class AnalizadorSintactico:
                                     elif tmp.tipo == "LlaveDerecha":
                                         finish = True
                                     else:
+                                        self.tokens.append(tmp)
                                         self.agregarError(tmp.tipo,"Coma o LlaveDerecha",tmp.linea,tmp.columna)
                                         break
                                 else:
+                                    self.tokens.append(tmp)
                                     self.agregarError(tmp.tipo,"Cadena",tmp.linea,tmp.columna)
                                     break
                             self.lista.append(temp_row)
@@ -326,12 +343,16 @@ class AnalizadorSintactico:
                         elif tmp.tipo == "CorcheteDerecho":
                             break
                         else:
+                            self.tokens.append(tmp)
                             self.agregarError(tmp.tipo,"LlaveIzquierda o CorcheteDerecho",tmp.linea,tmp.columna)
                 else:
+                    self.tokens.append(tmp)
                     self.agregarError(tmp.tipo,"CorcheteIzquierdo",tmp.linea,tmp.columna)
             else:
+                self.tokens.append(tmp)
                 self.agregarError(tmp.tipo,"Igual",tmp.linea,tmp.columna)
         else:
+            self.tokens.append(tmp)
             self.agregarError(tmp.tipo,"REGISTROS",tmp.linea,tmp.columna)
 
     def CONTEO(self, nodoInstruccion):
@@ -376,12 +397,16 @@ class AnalizadorSintactico:
                         self.inicio = nodoInstruccion
 
                     else:
+                        self.tokens.append(tmp)
                         self.agregarError(tmp.tipo,"PuntoComa",tmp.linea,tmp.columna)
                 else:
+                    self.tokens.append(tmp)
                     self.agregarError(tmp.tipo,"ParentesisDerecho",tmp.linea,tmp.columna)
             else:
+                self.tokens.append(tmp)
                 self.agregarError(tmp.tipo,"ParentesisIzquierdo",tmp.linea,tmp.columna)
         else:
+            self.tokens.append(tmp)
             self.agregarError(tmp.tipo,"conteo",tmp.linea,tmp.columna)
 
     def DATOS(self, nodoInstruccion):
@@ -421,12 +446,16 @@ class AnalizadorSintactico:
                         self.inicio = nodoInstruccion
                         pass
                     else:
+                        self.tokens.append(tmp)
                         self.agregarError(tmp.tipo,"PuntoComa",tmp.linea,tmp.columna)
                 else:
+                    self.tokens.append(tmp)
                     self.agregarError(tmp.tipo,"ParentesisDerecho",tmp.linea,tmp.columna)
             else:
+                self.tokens.append(tmp)
                 self.agregarError(tmp.tipo,"ParentesisIzquierdo",tmp.linea,tmp.columna)
         else:
+            self.tokens.append(tmp)
             self.agregarError(tmp.tipo,"DATOS",tmp.linea,tmp.columna)
 
     def PROMEDIO(self, nodoInstruccion):
@@ -479,14 +508,19 @@ class AnalizadorSintactico:
                                 self.agregarHijo(nodoInstruccion, n10)
                                 self.inicio = nodoInstruccion
                         else:
+                            self.tokens.append(tmp)
                             self.agregarError(tmp.tipo,"PuntoComa",tmp.linea,tmp.columna)
                     else:
+                        self.tokens.append(tmp)
                         self.agregarError(tmp.tipo,"ParentesisDerecho",tmp.linea,tmp.columna)
                 else:
+                    self.tokens.append(tmp)
                     self.agregarError(tmp.tipo,"Cadena",tmp.linea,tmp.columna)
             else:
+                self.tokens.append(tmp)
                 self.agregarError(tmp.tipo,"ParentesisIzquierdo",tmp.linea,tmp.columna)
         else:
+            self.tokens.append(tmp)
             self.agregarError(tmp.tipo,"PROMEDIO",tmp.linea,tmp.columna)
 
     def SUMAR(self, nodoInstruccion):
@@ -539,14 +573,19 @@ class AnalizadorSintactico:
                                 self.agregarHijo(nodoInstruccion, n10)
                                 self.inicio = nodoInstruccion
                         else:
+                            self.tokens.append(tmp)
                             self.agregarError(tmp.tipo,"PuntoComa",tmp.linea,tmp.columna)
                     else:
+                        self.tokens.append(tmp)
                         self.agregarError(tmp.tipo,"ParentesisDerecho",tmp.linea,tmp.columna)
                 else:
+                    self.tokens.append(tmp)
                     self.agregarError(tmp.tipo,"Cadena",tmp.linea,tmp.columna)
             else:
+                self.tokens.append(tmp)
                 self.agregarError(tmp.tipo,"ParentesisIzquierdo",tmp.linea,tmp.columna)
         else:
+            self.tokens.append(tmp)
             self.agregarError(tmp.tipo,"SUMAR",tmp.linea,tmp.columna)
 
     def CONTARSI(self, nodoInstruccion):
@@ -617,18 +656,25 @@ class AnalizadorSintactico:
                                         self.inicio = nodoInstruccion
                                         
                                 else:
+                                    self.tokens.append(tmp)
                                     self.agregarError(tmp.tipo,"PuntoComa",tmp.linea,tmp.columna)
                             else:
+                                self.tokens.append(tmp)
                                 self.agregarError(tmp.tipo,"ParentesisDerecho",tmp.linea,tmp.columna)
                         else:
+                            self.tokens.append(tmp)
                             self.agregarError(tmp.tipo,"Cadena o Decimal o Entero",tmp.linea,tmp.columna)
                     else:
+                        self.tokens.append(tmp)
                         self.agregarError(tmp.tipo,"Coma",tmp.linea,tmp.columna)
                 else:
+                    self.tokens.append(tmp)
                     self.agregarError(tmp.tipo,"Cadena",tmp.linea,tmp.columna)
             else:
+                self.tokens.append(tmp)
                 self.agregarError(tmp.tipo,"ParentesisIzquierdo",tmp.linea,tmp.columna)
         else:
+            self.tokens.append(tmp)
             self.agregarError(tmp.tipo,"CONTARSI",tmp.linea,tmp.columna)
 
     def MAX(self, nodoInstruccion):
@@ -682,14 +728,19 @@ class AnalizadorSintactico:
                                 self.agregarHijo(nodoInstruccion, n10)
                                 self.inicio = nodoInstruccion
                         else:
+                            self.tokens.append(tmp)
                             self.agregarError(tmp.tipo,"PuntoComa",tmp.linea,tmp.columna)
                     else:
+                        self.tokens.append(tmp)
                         self.agregarError(tmp.tipo,"ParentesisDerecho",tmp.linea,tmp.columna)
                 else:
+                    self.tokens.append(tmp)
                     self.agregarError(tmp.tipo,"Cadena",tmp.linea,tmp.columna)
             else:
+                self.tokens.append(tmp)
                 self.agregarError(tmp.tipo,"ParentesisIzquierdo",tmp.linea,tmp.columna)
         else:
+            self.tokens.append(tmp)
             self.agregarError(tmp.tipo,"MAX",tmp.linea,tmp.columna)
 
     def MIN(self, nodoInstruccion):
@@ -743,14 +794,19 @@ class AnalizadorSintactico:
                                 self.agregarHijo(nodoInstruccion, n10)
                                 self.inicio = nodoInstruccion
                         else:
+                            self.tokens.append(tmp)
                             self.agregarError(tmp.tipo,"PuntoComa",tmp.linea,tmp.columna)
                     else:
+                        self.tokens.append(tmp)
                         self.agregarError(tmp.tipo,"ParentesisDerecho",tmp.linea,tmp.columna)
                 else:
+                    self.tokens.append(tmp)
                     self.agregarError(tmp.tipo,"Cadena",tmp.linea,tmp.columna)
             else:
+                self.tokens.append(tmp)
                 self.agregarError(tmp.tipo,"ParentesisIzquierdo",tmp.linea,tmp.columna)
         else:
+            self.tokens.append(tmp)
             self.agregarError(tmp.tipo,"MIN",tmp.linea,tmp.columna)
 
     def REPORTE(self, nodoInstruccion):
@@ -801,14 +857,19 @@ class AnalizadorSintactico:
                             self.inicio = nodoInstruccion
                             
                         else:
+                            self.tokens.append(tmp)
                             self.agregarError(tmp.tipo,"PuntoComa",tmp.linea,tmp.columna)
                     else:
+                        self.tokens.append(tmp)
                         self.agregarError(tmp.tipo,"ParentesisDerecho",tmp.linea,tmp.columna)
                 else:
+                    self.tokens.append(tmp)
                     self.agregarError(tmp.tipo,"Cadena",tmp.linea,tmp.columna)
             else:
+                self.tokens.append(tmp)
                 self.agregarError(tmp.tipo,"ParentesisIzquierdo",tmp.linea,tmp.columna)
         else:
+            self.tokens.append(tmp)
             self.agregarError(tmp.tipo,"MIN",tmp.linea,tmp.columna)
 
     def crearNodo(self,etiqueta : str) -> str:
