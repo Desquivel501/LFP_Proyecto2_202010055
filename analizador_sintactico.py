@@ -4,6 +4,7 @@ from reportes import Reportes
 
 from graphviz import Digraph
 import uuid
+import copy
 
 class AnalizadorSintactico:
 
@@ -33,7 +34,6 @@ class AnalizadorSintactico:
         while tmp.tipo.upper() not in self.reservadas :
             tmp = self.tokens.pop()
 
-
     def impErrores(self):
         x = PrettyTable()
         x.field_names = ["Errores"]
@@ -44,7 +44,6 @@ class AnalizadorSintactico:
                 x.add_row([i])
             self.stream += "\n" + str(x)
             # print(x)
-
 
     def impTabla(self):
         x = PrettyTable()
@@ -61,12 +60,10 @@ class AnalizadorSintactico:
         self.impErrores()
         return (self.stream, self.errores, self.g)
 
-
     def INICIO(self):
         self.inicio = self.crearNodo('INICIO')
         self.INSTRUCCIONES()
         
-
     def INSTRUCCIONES(self):
         instrucciones = self.crearNodo('INSTRUCCIONES')
         self.agregarHijo(self.inicio, instrucciones)
@@ -96,41 +93,30 @@ class AnalizadorSintactico:
         try:
             tmp = self.tokens[-1]
             if tmp.tipo == 'imprimir':
-                instruccion = self.crearNodo('INSTRUCCION')
-                self.IMPRIMIR(instruccion)
+                self.IMPRIMIR()
             elif tmp.tipo == 'imprimirln':
-                instruccion = self.crearNodo('INSTRUCCION')
-                self.IMPRIMIRLN(instruccion)
+                self.IMPRIMIRLN()
             elif tmp.tipo == 'Claves':
-                # instruccion = self.crearNodo('INSTRUCCION')
-                self.CLAVES(None)
+                self.CLAVES()
             elif tmp.tipo == 'Registros':
                 # instruccion = self.crearNodo('INSTRUCCION')
-                self.REGISTROS(None)
+                self.REGISTROS()
             elif tmp.tipo == 'conteo':
-                instruccion = self.crearNodo('INSTRUCCION')
-                self.CONTEO(instruccion)
+                self.CONTEO()
             elif tmp.tipo == 'promedio':
-                instruccion = self.crearNodo('INSTRUCCION')
-                self.PROMEDIO(instruccion)
+                self.PROMEDIO()
             elif tmp.tipo == 'contarsi':
-                instruccion = self.crearNodo('INSTRUCCION')
-                self.CONTARSI(instruccion)
+                self.CONTARSI()
             elif tmp.tipo == 'datos':
-                instruccion = self.crearNodo('INSTRUCCION')
-                self.DATOS(instruccion)
+                self.DATOS()
             elif tmp.tipo == 'sumar':
-                instruccion = self.crearNodo('INSTRUCCION')
-                self.SUMAR(instruccion)
+                self.SUMAR()
             elif tmp.tipo == 'max':
-                instruccion = self.crearNodo('INSTRUCCION')
-                self.MAX(instruccion)
+                self.MAX()
             elif tmp.tipo == 'min':
-                instruccion = self.crearNodo('INSTRUCCION')
-                self.MIN(instruccion)
+                self.MIN()
             elif tmp.tipo == 'exportarReporte':
-                instruccion = self.crearNodo('INSTRUCCION')
-                self.REPORTE(instruccion)
+                self.REPORTE()
             else:
                 pass
         except IndexError:
@@ -140,37 +126,47 @@ class AnalizadorSintactico:
             print(e)
             pass
 
-    def IMPRIMIR(self, nodoInstruccion):
+    def IMPRIMIR(self):
         cadena = None
         tmp = self.tokens.pop()
         if tmp.tipo == "imprimir":
-            n0 = self.crearNodo('IMPRIMIR')
-            n10 = self.crearNodo(tmp.lexema)
-            self.agregarHijo(n0, n10)
+            imprimir = tmp.lexema
             tmp = self.tokens.pop()
             
             if tmp.tipo == "ParentesisIzquierdo":
-                n1 = self.crearNodo('ParentesisIzquierdo')
-                n2 = self.crearNodo(tmp.lexema)
-                self.agregarHijo(n1, n2)
+                parentesis_i = tmp.lexema
                 tmp = self.tokens.pop()
                 
                 if tmp.tipo == "Cadena":
-                    cadena = tmp.lexema
+                    cadena = copy.deepcopy(tmp.lexema)
                     cadena = cadena.replace('"', '')
                     self.stream += cadena
-                    n3 = self.crearNodo('Cadena')
-                    n4 = self.crearNodo(tmp.lexema)
-                    self.agregarHijo(n3, n4)
+                    cadena_lxm = tmp.lexema
                     tmp = self.tokens.pop()
                     
                     if tmp.tipo == "ParentesisDerecho":
-                        n5 = self.crearNodo('ParentesisDerecho')
-                        n6 = self.crearNodo(tmp.lexema)
-                        self.agregarHijo(n5, n6)
+                        parentesis_d = tmp.lexema  
                         tmp = self.tokens.pop()
                         
                         if tmp.tipo == "PuntoComa":
+                            nodoInstruccion = self.crearNodo('INSTRUCCION')
+                            
+                            n0 = self.crearNodo('IMPRIMIR')
+                            n10 = self.crearNodo(imprimir)
+                            self.agregarHijo(n0, n10)
+                            
+                            n1 = self.crearNodo('ParentesisIzquierdo')
+                            n2 = self.crearNodo(parentesis_i)
+                            self.agregarHijo(n1, n2)
+                            
+                            n3 = self.crearNodo('Cadena')
+                            n4 = self.crearNodo(cadena_lxm)
+                            self.agregarHijo(n3, n4)
+                            
+                            n5 = self.crearNodo('ParentesisDerecho')
+                            n6 = self.crearNodo(parentesis_d)
+                            self.agregarHijo(n5, n6)
+                    
                             n7 = self.crearNodo('PuntoComa')
                             n8 = self.crearNodo(tmp.lexema)
                             self.agregarHijo(n7, n8)
@@ -202,37 +198,47 @@ class AnalizadorSintactico:
             self.tokens.append(tmp)
             self.agregarError(tmp.tipo,"IMPRIMIR",tmp.linea,tmp.columna)
 
-    def IMPRIMIRLN(self, nodoInstruccion):
+    def IMPRIMIRLN(self):
         cadena = None
         tmp = self.tokens.pop()
         if tmp.tipo == "imprimirln":
-            n0 = self.crearNodo('IMPRIMIRLN')
-            n2 = self.crearNodo(tmp.lexema)
-            self.agregarHijo(n0, n2)
+            imprimir = tmp.lexema
             tmp = self.tokens.pop()
             
             if tmp.tipo == "ParentesisIzquierdo":
-                n3 = self.crearNodo('ParentesisIzquierdo')
-                n4 = self.crearNodo(tmp.lexema)
-                self.agregarHijo(n3, n4)
+                parentesis_i = tmp.lexema
                 tmp = self.tokens.pop()
                 
                 if tmp.tipo == "Cadena":
+                    cadena_lxm = copy.deepcopy(tmp.lexema)
                     cadena = tmp.lexema
                     cadena = cadena.replace('"', '')
                     self.stream += "\n" + cadena
-                    n5 = self.crearNodo('Cadena')
-                    n6 = self.crearNodo(tmp.lexema)
-                    self.agregarHijo(n5, n6)
                     tmp = self.tokens.pop()
                     
                     if tmp.tipo == "ParentesisDerecho":
-                        n7 = self.crearNodo('ParentesisDerecho')
-                        n8 = self.crearNodo(tmp.lexema)
-                        self.agregarHijo(n7, n8)
+                        parentesis_d = tmp.lexema
                         tmp = self.tokens.pop()
                         
                         if tmp.tipo == "PuntoComa":
+                            nodoInstruccion = self.crearNodo('INSTRUCCION')
+                            
+                            n0 = self.crearNodo('IMPRIMIRLN')
+                            n2 = self.crearNodo(imprimir)
+                            self.agregarHijo(n0, n2)
+                            
+                            n3 = self.crearNodo('ParentesisIzquierdo')
+                            n4 = self.crearNodo(parentesis_i)
+                            self.agregarHijo(n3, n4)
+                            
+                            n5 = self.crearNodo('Cadena')
+                            n6 = self.crearNodo(cadena_lxm)
+                            self.agregarHijo(n5, n6)
+                            
+                            n7 = self.crearNodo('ParentesisDerecho')
+                            n8 = self.crearNodo(parentesis_d)
+                            self.agregarHijo(n7, n8)
+                            
                             n9 = self.crearNodo('PuntoComa')
                             n10 = self.crearNodo(tmp.lexema)
                             self.agregarHijo(n9, n10)
@@ -264,7 +270,7 @@ class AnalizadorSintactico:
             self.tokens.append(tmp)
             self.agregarError(tmp.tipo,"IMPRIMIRLN",tmp.linea,tmp.columna)
 
-    def CLAVES(self, nodoInstruccion):
+    def CLAVES(self):
         temp_row = []
         tmp = self.tokens.pop()
         if tmp.tipo == "Claves":
@@ -304,7 +310,7 @@ class AnalizadorSintactico:
 
         self.claves = temp_row
 
-    def REGISTROS(self, nodoInstruccion):
+    def REGISTROS(self):
 
         tmp = self.tokens.pop()
         if tmp.tipo == "Registros":
@@ -355,24 +361,18 @@ class AnalizadorSintactico:
             self.tokens.append(tmp)
             self.agregarError(tmp.tipo,"REGISTROS",tmp.linea,tmp.columna)
 
-    def CONTEO(self, nodoInstruccion):
+    def CONTEO(self):
         tmp = self.tokens.pop()
         if tmp.tipo == "conteo":
-            n0 = self.crearNodo('CONTEO')
-            n1 = self.crearNodo(tmp.lexema)
-            self.agregarHijo(n0, n1)
+            conteo = tmp.lexema
             tmp = self.tokens.pop()
             
             if tmp.tipo == "ParentesisIzquierdo":
-                n2 = self.crearNodo('ParentesisIzquierdo')
-                n3 = self.crearNodo(tmp.lexema)
-                self.agregarHijo(n2, n3)
+                parentesis_i = tmp.lexema
                 tmp = self.tokens.pop()
                 
                 if tmp.tipo == "ParentesisDerecho":
-                    n4 = self.crearNodo('ParentesisDerecho')
-                    n5 = self.crearNodo(tmp.lexema)
-                    self.agregarHijo(n4, n5)
+                    parentesis_d = tmp.lexema
                     tmp = self.tokens.pop()
                     
                     if tmp.tipo == "PuntoComa":
@@ -381,6 +381,20 @@ class AnalizadorSintactico:
                         conteo = int(filas)*int(columnas)
                         # print(">>>"+str(conteo))
                         self.stream += "\n>>>" + str(conteo)
+                        
+                        nodoInstruccion = self.crearNodo('INSTRUCCION')
+                        
+                        n0 = self.crearNodo('CONTEO')
+                        n1 = self.crearNodo(conteo)
+                        self.agregarHijo(n0, n1)
+                        
+                        n2 = self.crearNodo('ParentesisIzquierdo')
+                        n3 = self.crearNodo(parentesis_i)
+                        self.agregarHijo(n2, n3)
+                        
+                        n4 = self.crearNodo('ParentesisDerecho')
+                        n5 = self.crearNodo(parentesis_d)
+                        self.agregarHijo(n4, n5)
                         
                         n7 = self.crearNodo('PuntoComa')
                         n8 = self.crearNodo(tmp.lexema)
@@ -409,28 +423,37 @@ class AnalizadorSintactico:
             self.tokens.append(tmp)
             self.agregarError(tmp.tipo,"conteo",tmp.linea,tmp.columna)
 
-    def DATOS(self, nodoInstruccion):
+    def DATOS(self):
         tmp = self.tokens.pop()
         if tmp.tipo == "datos":
-            n0 = self.crearNodo('DATOS')
-            n1 = self.crearNodo(tmp.lexema)
-            self.agregarHijo(n0, n1)
+            datos = tmp.lexema
             tmp = self.tokens.pop()
 
             if tmp.tipo == "ParentesisIzquierdo":
-                n2 = self.crearNodo('ParentesisIzquierdo')
-                n3 = self.crearNodo(tmp.lexema)
-                self.agregarHijo(n2, n3)
+                parentesis_i = tmp.lexema
                 tmp = self.tokens.pop()
 
                 if tmp.tipo == "ParentesisDerecho":
-                    n4 = self.crearNodo('ParentesisIzquierdo')
-                    n5 = self.crearNodo(tmp.lexema)
-                    self.agregarHijo(n4, n5)
+                    parentesis_d = tmp.lexema
                     tmp = self.tokens.pop()
 
                     if tmp.tipo == "PuntoComa":
                         self.impTabla()
+                        
+                        nodoInstruccion = self.crearNodo('INSTRUCCION')
+                        
+                        n0 = self.crearNodo('DATOS')
+                        n1 = self.crearNodo(datos)
+                        self.agregarHijo(n0, n1)
+                        
+                        n2 = self.crearNodo('ParentesisIzquierdo')
+                        n3 = self.crearNodo(parentesis_i)
+                        self.agregarHijo(n2, n3)
+                        
+                        n4 = self.crearNodo('ParentesisDerecho')
+                        n5 = self.crearNodo(parentesis_d)
+                        self.agregarHijo(n4, n5)
+                        
                         n6 = self.crearNodo('ParentesisIzquierdo')
                         n7 = self.crearNodo(tmp.lexema)
                         self.agregarHijo(n6, n7)
@@ -458,32 +481,28 @@ class AnalizadorSintactico:
             self.tokens.append(tmp)
             self.agregarError(tmp.tipo,"DATOS",tmp.linea,tmp.columna)
 
-    def PROMEDIO(self, nodoInstruccion):
+    def PROMEDIO(self):
         cadena = None
         tmp = self.tokens.pop()
         if tmp.tipo == "promedio":
-            n0 = self.crearNodo('PROMEDIO')
-            n1 = self.crearNodo(tmp.lexema)
-            self.agregarHijo(n0, n1)
+            promedio = tmp.lexema
+            
             tmp = self.tokens.pop()
             
             if tmp.tipo == "ParentesisIzquierdo":
-                n2 = self.crearNodo('ParentesisIzquierdo')
-                n3 = self.crearNodo(tmp.lexema)
-                self.agregarHijo(n2, n3)
+                parentesis_i = tmp.lexema
+                
                 tmp = self.tokens.pop()
                 
                 if tmp.tipo == "Cadena":
+                    cadena_lxm = tmp.lexema
                     cadena = tmp.lexema
-                    n4 = self.crearNodo('Cadena')
-                    n5 = self.crearNodo(tmp.lexema)
-                    self.agregarHijo(n4, n5)
+                    
                     tmp = self.tokens.pop()
                     
                     if tmp.tipo == "ParentesisDerecho":
-                        n6 = self.crearNodo('ParentesisDerecho')
-                        n7 = self.crearNodo(tmp.lexema)
-                        self.agregarHijo(n6, n7)
+                        parentesis_d = tmp.lexema
+                        
                         tmp = self.tokens.pop()
                         
                         if tmp.tipo == "PuntoComa":
@@ -493,6 +512,25 @@ class AnalizadorSintactico:
                             else:
                                 # print(">>>",resultado)
                                 self.stream += "\n>>>" + resultado
+                                
+                                nodoInstruccion = self.crearNodo('INSTRUCCION')
+                                
+                                n0 = self.crearNodo('PROMEDIO')
+                                n1 = self.crearNodo(promedio)
+                                self.agregarHijo(n0, n1)
+                                
+                                n2 = self.crearNodo('ParentesisIzquierdo')
+                                n3 = self.crearNodo(parentesis_i)
+                                self.agregarHijo(n2, n3)
+                                
+                                n4 = self.crearNodo('Cadena')
+                                n5 = self.crearNodo(cadena_lxm)
+                                self.agregarHijo(n4, n5)
+                                
+                                n6 = self.crearNodo('ParentesisDerecho')
+                                n7 = self.crearNodo(parentesis_d)
+                                self.agregarHijo(n6, n7)
+                                
                                 n8 = self.crearNodo('PuntoComa')
                                 n9 = self.crearNodo(tmp.lexema)
                                 self.agregarHijo(n8, n9)
@@ -523,32 +561,24 @@ class AnalizadorSintactico:
             self.tokens.append(tmp)
             self.agregarError(tmp.tipo,"PROMEDIO",tmp.linea,tmp.columna)
 
-    def SUMAR(self, nodoInstruccion):
+    def SUMAR(self):
         cadena = None
         tmp = self.tokens.pop()
         if tmp.tipo == "sumar":
-            n0 = self.crearNodo('SUMAR')
-            n1 = self.crearNodo(tmp.lexema)
-            self.agregarHijo(n0, n1)
+            sumar = tmp.lexema
             tmp = self.tokens.pop()
             
             if tmp.tipo == "ParentesisIzquierdo":
-                n2 = self.crearNodo('ParentesisIzquierdo')
-                n3 = self.crearNodo(tmp.lexema)
-                self.agregarHijo(n2, n3)
+                parentesis_i = tmp.lexema
                 tmp = self.tokens.pop()
                 
                 if tmp.tipo == "Cadena":
-                    n4 = self.crearNodo('Cadena')
-                    n5 = self.crearNodo(tmp.lexema)
-                    self.agregarHijo(n4, n5)
+                    cadena_lxm = tmp.lexema
                     cadena = tmp.lexema
                     tmp = self.tokens.pop()
                     
                     if tmp.tipo == "ParentesisDerecho":
-                        n6 = self.crearNodo('ParentesisDerecho')
-                        n7 = self.crearNodo(tmp.lexema)
-                        self.agregarHijo(n6, n7)
+                        parentesis_d = tmp.lexema
                         tmp = self.tokens.pop()
                         
                         if tmp.tipo == "PuntoComa":
@@ -558,8 +588,26 @@ class AnalizadorSintactico:
                             else:
                                 # print(">>>",resultado)
                                 self.stream += "\n>>>"+resultado
+                                nodoInstruccion = self.crearNodo('INSTRUCCION')
+                                
+                                n0 = self.crearNodo('SUMAR')
+                                n1 = self.crearNodo(sumar)
+                                self.agregarHijo(n0, n1)
+                                
+                                n2 = self.crearNodo('ParentesisIzquierdo')
+                                n3 = self.crearNodo(parentesis_i)
+                                self.agregarHijo(n2, n3)
+                                
+                                n4 = self.crearNodo('Cadena')
+                                n5 = self.crearNodo(tmp.lexema)
+                                self.agregarHijo(n4, n5)
+                                
+                                n6 = self.crearNodo('ParentesisDerecho')
+                                n7 = self.crearNodo(parentesis_d)
+                                self.agregarHijo(n6, n7)
+                                
                                 n8 = self.crearNodo('PuntoComa')
-                                n9 = self.crearNodo(tmp.lexema)
+                                n9 = self.crearNodo(cadena_lxm)
                                 self.agregarHijo(n8, n9)
                                 
                                 n10 = self.crearNodo('INSTRUCCION_SUMAR')
@@ -588,46 +636,34 @@ class AnalizadorSintactico:
             self.tokens.append(tmp)
             self.agregarError(tmp.tipo,"SUMAR",tmp.linea,tmp.columna)
 
-    def CONTARSI(self, nodoInstruccion):
+    def CONTARSI(self):
         campo = None
         valor = None
         tmp = self.tokens.pop()
         if tmp.tipo == "contarsi":
-            n0 = self.crearNodo('CONTARSI')
-            n1 = self.crearNodo(tmp.lexema)
-            self.agregarHijo(n0, n1)
+            contarsi = tmp.lexema
             tmp = self.tokens.pop()
             
             if tmp.tipo == "ParentesisIzquierdo":
-                n2 = self.crearNodo('ParentesisIzquierdo')
-                n3 = self.crearNodo(tmp.lexema)
-                self.agregarHijo(n2, n3)
+                parentesis_i = tmp.lexema
                 tmp = self.tokens.pop()
                 
                 if tmp.tipo == "Cadena":
-                    campo = tmp.lexema
-                    n4 = self.crearNodo('Cadena')
-                    n5 = self.crearNodo(tmp.lexema)
-                    self.agregarHijo(n4, n5)
+                    cadena1 = tmp.lexema
+                    campo = tmp.lexema   
                     tmp = self.tokens.pop()
                     
                     if tmp.tipo == "Coma":
-                        n6 = self.crearNodo('Coma')
-                        n7 = self.crearNodo(tmp.lexema)
-                        self.agregarHijo(n6, n7)
+                        coma = tmp.lexema  
                         tmp = self.tokens.pop()
                         
                         if tmp.tipo == "Cadena" or tmp.tipo == "Decimal" or tmp.tipo == "Entero":
                             valor = tmp.lexema
-                            n8 = self.crearNodo('Cadena')
-                            n9 = self.crearNodo(tmp.lexema)
-                            self.agregarHijo(n8, n9)
+                            cadena2 = tmp.lexema
                             tmp = self.tokens.pop()
                             
                             if tmp.tipo == "ParentesisDerecho":
-                                n10 = self.crearNodo('ParentesisDerecho')
-                                n11 = self.crearNodo(tmp.lexema)
-                                self.agregarHijo(n10, n11)
+                                parentesis_d = tmp.lexema
                                 tmp = self.tokens.pop()
                                 
                                 if tmp.tipo == "PuntoComa":
@@ -637,6 +673,32 @@ class AnalizadorSintactico:
                                     else:
                                         # print(">>>",resultado)
                                         self.stream += "\n>>>"+resultado
+                                        
+                                        nodoInstruccion = self.crearNodo('INSTRUCCION')
+                                        
+                                        n0 = self.crearNodo('CONTARSI')
+                                        n1 = self.crearNodo(contarsi)
+                                        self.agregarHijo(n0, n1)
+                                        
+                                        n2 = self.crearNodo('ParentesisIzquierdo')
+                                        n3 = self.crearNodo(parentesis_i)
+                                        self.agregarHijo(n2, n3)
+                                        
+                                        n4 = self.crearNodo('Cadena')
+                                        n5 = self.crearNodo(cadena1)
+                                        self.agregarHijo(n4, n5)
+                                        
+                                        n6 = self.crearNodo('Coma')
+                                        n7 = self.crearNodo(coma)
+                                        self.agregarHijo(n6, n7)
+                                        
+                                        n8 = self.crearNodo('Cadena')
+                                        n9 = self.crearNodo(cadena2)
+                                        self.agregarHijo(n8, n9)
+                                        
+                                        n10 = self.crearNodo('ParentesisDerecho')
+                                        n11 = self.crearNodo(parentesis_d)
+                                        self.agregarHijo(n10, n11)
                                         
                                         n12 = self.crearNodo('PuntoComa')
                                         n13 = self.crearNodo(tmp.lexema)
@@ -677,32 +739,24 @@ class AnalizadorSintactico:
             self.tokens.append(tmp)
             self.agregarError(tmp.tipo,"CONTARSI",tmp.linea,tmp.columna)
 
-    def MAX(self, nodoInstruccion):
+    def MAX(self):
         cadena = None
         tmp = self.tokens.pop()
         if tmp.tipo == "max":
-            n0 = self.crearNodo('MAX')
-            n1 = self.crearNodo(tmp.lexema)
-            self.agregarHijo(n0, n1)
+            max = tmp.lexema
             tmp = self.tokens.pop()
             
             if tmp.tipo == "ParentesisIzquierdo":
-                n2 = self.crearNodo('ParentesisIzquierdo')
-                n3 = self.crearNodo(tmp.lexema)
-                self.agregarHijo(n2, n3)
+                parentesis_i = tmp.lexema  
                 tmp = self.tokens.pop()
                 
                 if tmp.tipo == "Cadena":
+                    cadena_lxm = tmp.lexema
                     cadena = tmp.lexema
-                    n4 = self.crearNodo('Cadena')
-                    n5 = self.crearNodo(tmp.lexema)
-                    self.agregarHijo(n4, n5)
                     tmp = self.tokens.pop()
                     
                     if tmp.tipo == "ParentesisDerecho":
-                        n6 = self.crearNodo('ParentesisDerecho')
-                        n7 = self.crearNodo(tmp.lexema)
-                        self.agregarHijo(n6, n7)
+                        parentesis_d = tmp.lexema
                         tmp = self.tokens.pop()
                         
                         if tmp.tipo == "PuntoComa":
@@ -712,6 +766,24 @@ class AnalizadorSintactico:
                             else:
                                 # print(">>>",resultado)
                                 self.stream += "\n>>>"+resultado
+                                
+                                nodoInstruccion = self.crearNodo('INSTRUCCION')
+                                
+                                n0 = self.crearNodo('MAX')
+                                n1 = self.crearNodo(max)
+                                self.agregarHijo(n0, n1)
+                                
+                                n2 = self.crearNodo('ParentesisIzquierdo')
+                                n3 = self.crearNodo(parentesis_i)
+                                self.agregarHijo(n2, n3)
+                                
+                                n4 = self.crearNodo('Cadena')
+                                n5 = self.crearNodo(cadena_lxm)
+                                self.agregarHijo(n4, n5)
+                                
+                                n6 = self.crearNodo('ParentesisDerecho')
+                                n7 = self.crearNodo(parentesis_d)
+                                self.agregarHijo(n6, n7)
                                 
                                 n8 = self.crearNodo('PuntoComa')
                                 n9 = self.crearNodo(tmp.lexema)
@@ -743,32 +815,24 @@ class AnalizadorSintactico:
             self.tokens.append(tmp)
             self.agregarError(tmp.tipo,"MAX",tmp.linea,tmp.columna)
 
-    def MIN(self, nodoInstruccion):
+    def MIN(self):
         cadena = None
         tmp = self.tokens.pop()
         if tmp.tipo == "min":
-            n0 = self.crearNodo('MIN')
-            n1 = self.crearNodo(tmp.lexema)
-            self.agregarHijo(n0, n1)
+            min = tmp.lexema
             tmp = self.tokens.pop()
             
             if tmp.tipo == "ParentesisIzquierdo":
-                n2 = self.crearNodo('ParentesisIzquierdo')
-                n3 = self.crearNodo(tmp.lexema)
-                self.agregarHijo(n2, n3)
+                parentesis_i = tmp.lexema 
                 tmp = self.tokens.pop()
                 
                 if tmp.tipo == "Cadena":
+                    cadena_lxm = tmp.lexema
                     cadena = tmp.lexema
-                    n4 = self.crearNodo('Cadena')
-                    n5 = self.crearNodo(tmp.lexema)
-                    self.agregarHijo(n4, n5)
                     tmp = self.tokens.pop()
                     
                     if tmp.tipo == "ParentesisDerecho":
-                        n6 = self.crearNodo('ParentesisDerecho')
-                        n7 = self.crearNodo(tmp.lexema)
-                        self.agregarHijo(n6, n7)
+                        parentesis_d = tmp.lexema
                         tmp = self.tokens.pop()
                         
                         if tmp.tipo == "PuntoComa":
@@ -778,6 +842,24 @@ class AnalizadorSintactico:
                             else:
                                 # print(">>>",resultado)
                                 self.stream += "\n>>>"+ resultado
+                                
+                                nodoInstruccion = self.crearNodo('INSTRUCCION')
+                                
+                                n0 = self.crearNodo('MAX')
+                                n1 = self.crearNodo(min)
+                                self.agregarHijo(n0, n1)
+                                
+                                n2 = self.crearNodo('ParentesisIzquierdo')
+                                n3 = self.crearNodo(parentesis_i)
+                                self.agregarHijo(n2, n3)
+                                
+                                n4 = self.crearNodo('Cadena')
+                                n5 = self.crearNodo(cadena_lxm)
+                                self.agregarHijo(n4, n5)
+                                
+                                n6 = self.crearNodo('ParentesisDerecho')
+                                n7 = self.crearNodo(parentesis_d)
+                                self.agregarHijo(n6, n7)
                                 
                                 n8 = self.crearNodo('PuntoComa')
                                 n9 = self.crearNodo(tmp.lexema)
@@ -809,37 +891,48 @@ class AnalizadorSintactico:
             self.tokens.append(tmp)
             self.agregarError(tmp.tipo,"MIN",tmp.linea,tmp.columna)
 
-    def REPORTE(self, nodoInstruccion):
+    def REPORTE(self):
         cadena = None
         tmp = self.tokens.pop()
         if tmp.tipo == "exportarReporte":
-            n0 = self.crearNodo('REPORTE')
-            n1 = self.crearNodo(tmp.lexema)
-            self.agregarHijo(n0, n1)
+            reporte = tmp.lexema
             tmp = self.tokens.pop()
             
             if tmp.tipo == "ParentesisIzquierdo":
-                n2 = self.crearNodo('ParentesisIzquierdo')
-                n3 = self.crearNodo(tmp.lexema)
-                self.agregarHijo(n2, n3)
+                parentesis_i = tmp.lexema 
                 tmp = self.tokens.pop()
                 
                 if tmp.tipo == "Cadena":
                     cadena = tmp.lexema
-                    n4 = self.crearNodo('Cadena')
-                    n5 = self.crearNodo(tmp.lexema)
-                    self.agregarHijo(n4, n5)
+                    cadena_lxm = tmp.lexema
                     tmp = self.tokens.pop()
                     
                     if tmp.tipo == "ParentesisDerecho":
-                        n6 = self.crearNodo('ParentesisDerecho')
-                        n7 = self.crearNodo(tmp.lexema)
-                        self.agregarHijo(n6, n7)
+                        parentesis_d = tmp.lexema
                         tmp = self.tokens.pop()
                         
                         if tmp.tipo == "PuntoComa":
                             reporte = self.reporte.reporteHtml(cadena, self.claves, self.lista)
                             self.stream += reporte
+                            
+                            nodoInstruccion = self.crearNodo('INSTRUCCION')
+                                
+                            n0 = self.crearNodo('MAX')
+                            n1 = self.crearNodo(reporte)
+                            self.agregarHijo(n0, n1)
+                                
+                            n2 = self.crearNodo('ParentesisIzquierdo')
+                            n3 = self.crearNodo(parentesis_i)
+                            self.agregarHijo(n2, n3)
+                                
+                            n4 = self.crearNodo('Cadena')
+                            n5 = self.crearNodo(cadena_lxm)
+                            self.agregarHijo(n4, n5)
+                                
+                            n6 = self.crearNodo('ParentesisDerecho')
+                            n7 = self.crearNodo(parentesis_d)
+                            self.agregarHijo(n6, n7)
+                                
                             
                             n8 = self.crearNodo('PuntoComa')
                             n9 = self.crearNodo(tmp.lexema)
